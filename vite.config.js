@@ -20,6 +20,7 @@ export default defineConfig({
     minify: 'terser',
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
+      external: ['/boy.png'],
       output: {
         manualChunks: {
           'vue-vendor': ['vue', 'vue-router'],
