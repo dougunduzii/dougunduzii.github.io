@@ -1,0 +1,61 @@
+<<<<<<< HEAD
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Backend
+backend/venv/
+backend/*.db
+backend/__pycache__/
+
+# Build
+build/
+out/
+
+# IDE
+.trae/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+=======
+.
+>>>>>>> 959465a7243c8bae4edd9cd006b04438d9c3454e
