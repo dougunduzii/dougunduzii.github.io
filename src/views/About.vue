@@ -5,7 +5,7 @@
   <div class="about-page">
     <div class="container">
       <div class="about-hero">
-        <div class="avatar-placeholder"><img src="/blog/boy.png"></div>
+        <div class="avatar-placeholder"><img src="/boy.png"></div>
         <h1>你好，我是一名开发者</h1>
         <p class="about-subtitle">热爱编程，热爱生活，用代码改变世界</p>
       </div>
