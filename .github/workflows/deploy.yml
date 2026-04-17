@@ -30,11 +30,34 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Check Node version
+        run: node --version
+
+      - name: Check NPM version
+        run: npm --version
+
       - name: Install dependencies
-        run: npm ci
+        run: |
+          echo "Installing dependencies..."
+          npm ci
+        env:
+          CI: true
+
+      - name: List installed packages
+        run: npm list --depth=0
 
       - name: Build
-        run: npm run build
+        run: |
+          echo "Building project..."
+          npm run build
+        env:
+          CI: true
+
+      - name: Check dist folder
+        run: |
+          echo "Checking dist folder..."
+          ls -la dist/
+          ls -la dist/posts/ || echo "No posts folder in dist"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
