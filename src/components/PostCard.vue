@@ -8,7 +8,6 @@ defineProps({
 
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
-  // 尝试解析 YYYY-MM-DD 格式
   const match = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/)
   if (match) {
     const year = match[1]
@@ -16,7 +15,6 @@ const formatDate = (dateStr) => {
     const day = parseInt(match[3])
     return `${year}.${month}.${day}`
   }
-  // 如果不是预期格式，尝试用 Date 解析
   const d = new Date(dateStr)
   const isValid = !isNaN(d.getTime())
   if (!isValid) return ''
@@ -25,17 +23,54 @@ const formatDate = (dateStr) => {
   const day = d.getDate()
   return `${year}.${month}.${day}`
 }
+
+const getCoverStyle = (post) => {
+  if (post.cover) return { backgroundImage: `url(${post.cover})` }
+  const config = post.coverConfig || {}
+  return {
+    background: `linear-gradient(135deg, ${config.bg || '#1e1e2e'} 0%, ${config.accent2 || '#2a2a3e'} 100%)`,
+  }
+}
+
+const getAccentColor = (post) => {
+  const config = post.coverConfig || {}
+  return config.accent || '#f7df1e'
+}
+
+const getCodeSymbol = (post) => {
+  const config = post.coverConfig || {}
+  return config.code || '{ }'
+}
+
+const getSymbol1 = (post) => {
+  const config = post.coverConfig || {}
+  return config.symbol || '//'
+}
+
+const getSymbol2 = (post) => {
+  const config = post.coverConfig || {}
+  return config.accent2 || '#ffbd2a'
+}
 </script>
 
 <template>
   <article class="post-card">
     <div class="post-card-cover-wrap">
-      <img 
-        class="post-card-cover" 
-        :src="post.cover" 
-        :alt="post.title"
-        loading="lazy"
-      >
+      <div class="post-card-cover" :style="getCoverStyle(post)">
+        <div v-if="!post.cover" class="post-card-cover-content">
+          <div class="post-card-cover-code" :style="{ color: getAccentColor(post) }">
+            <span class="code-symbol">{{ getCodeSymbol(post) }}</span>
+          </div>
+          <div class="post-card-cover-decorators">
+            <span class="decorator d1" :style="{ color: getAccentColor(post) }">{{ getSymbol1(post) }}</span>
+            <span class="decorator d2" :style="{ color: getAccentColor(post) }">( )</span>
+            <span class="decorator d3" :style="{ color: getSymbol2(post) }">=</span>
+            <span class="decorator d4" :style="{ color: getAccentColor(post) }">;</span>
+            <span class="decorator d5" :style="{ color: getSymbol2(post) }">{{ getSymbol1(post) }}</span>
+          </div>
+        </div>
+        <div class="post-card-cover-shine" :style="{ background: `linear-gradient(105deg, transparent 40%, ${getAccentColor(post)}10 50%, transparent 60%)` }"></div>
+      </div>
       <div class="post-card-cover-overlay"></div>
     </div>
     <div class="post-card-body">
@@ -90,13 +125,64 @@ const formatDate = (dateStr) => {
 .post-card-cover {
   width: 100%;
   height: 210px;
-  object-fit: cover;
-  background: var(--color-tag-bg);
+  background-size: cover;
+  background-position: center;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.post-card-cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 70%);
 }
 
 .post-card:hover .post-card-cover {
   transform: scale(1.05);
+}
+
+.post-card-cover-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.post-card-cover-code {
+  font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 30px currentColor;
+  margin-bottom: 12px;
+}
+
+.post-card-cover-decorators {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+  font-size: 1.1rem;
+}
+
+.decorator {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.post-card:hover .decorator {
+  opacity: 0.8;
+}
+
+.post-card-cover-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .post-card-cover-overlay {
@@ -179,6 +265,15 @@ const formatDate = (dateStr) => {
     height: 180px;
   }
   
+  .post-card-cover-code {
+    font-size: 2.8rem;
+  }
+
+  .post-card-cover-decorators {
+    font-size: 0.9rem;
+    gap: 12px;
+  }
+
   .post-card-body {
     padding: 18px;
   }

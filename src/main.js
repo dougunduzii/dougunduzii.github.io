@@ -9,7 +9,7 @@ import About from './views/About.vue'
 
 const routes = [
   { path: '/', component: Home },
-  { path: '/post/:slug', component: Post },
+  { path: '/post/:slug(.*)', component: Post },
   { path: '/about', component: About }
 ]
 

@@ -3,6 +3,7 @@ import { ref, onMounted, provide } from 'vue'
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
 import BackToTop from './components/BackToTop.vue'
+import Sidebar from './components/Sidebar.vue'
 
 const theme = ref(localStorage.getItem('blog-theme') || 'light')
 
@@ -23,14 +24,17 @@ provide('toggleTheme', toggleTheme)
 <template>
   <div class="app" :class="theme">
     <Navbar />
-    <main class="main-content">
-      <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-    </main>
-    <Footer />
+    <Sidebar />
+    <div class="app-wrapper">
+      <main class="main-content">
+        <router-view v-slot="{ Component }">
+          <transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </main>
+      <Footer />
+    </div>
     <BackToTop />
   </div>
 </template>
@@ -47,6 +51,17 @@ provide('toggleTheme', toggleTheme)
   background-size: cover;
 }
 
+.app-wrapper {
+  margin-left: 280px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
@@ -55,5 +70,11 @@ provide('toggleTheme', toggleTheme)
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .app-wrapper {
+    margin-left: 0;
+  }
 }
 </style>

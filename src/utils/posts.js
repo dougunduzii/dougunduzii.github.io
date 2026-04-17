@@ -21,7 +21,7 @@ const parseFrontmatter = (text) => {
       meta[currentKey] = val === '' ? [] : val
     } else {
       const listMatch = line.match(/^\s*-\s+(.*)$/)
-      if (listMatch && currentKey && meta[currentKey]) {
+      if (listMatch && currentKey && currentKey in meta) {
         if (!Array.isArray(meta[currentKey])) {
           meta[currentKey] = [meta[currentKey]]
         }
@@ -33,17 +33,19 @@ const parseFrontmatter = (text) => {
   return { meta, content: markdown }
 }
 
-const ensureTagsArray = (meta) => {
-  if (typeof meta.tags === 'string') {
-    meta.tags = [meta.tags]
+// 从 slug 路径中提取分类（文件夹名）
+const extractCategoryFromSlug = (slug) => {
+  const parts = slug.split('/')
+  if (parts.length > 1) {
+    return parts[0] // 文件夹名作为分类
   }
-  if (!Array.isArray(meta.tags)) {
-    meta.tags = []
-  }
+  return '未分类'
 }
 
 const extractDateFromSlug = (slug) => {
-  const match = slug.match(/^(\d{1,2})\.(\d{1,2})/)
+  // 从文件名部分提取日期（去掉文件夹前缀）
+  const filename = slug.split('/').pop()
+  const match = filename.match(/^(\d{1,2})\.(\d{1,2})/)
   if (match) {
     const month = match[1].padStart(2, '0')
     const day = match[2].padStart(2, '0')
@@ -53,49 +55,56 @@ const extractDateFromSlug = (slug) => {
 }
 
 const extractTitleFromSlug = (slug) => {
-  const match = slug.match(/^\d{1,2}\.\d{1,2}\s+(.+)$/)
+  const filename = slug.split('/').pop()
+  const match = filename.match(/^\d{1,2}\.\d{1,2}\s+(.+)$/)
   if (match) {
     return match[1]
   }
-  return slug
+  return filename
 }
 
 const cache = ref({})
 
-// 编程语言 Logo 封面配置
+// 编程语言封面配置 - 使用代码主题色 + 装饰元素
 const LANG_COVERS = {
-  'javascript': {
-    gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg',
-    color: '#f7df1e',
-    accent: '#323330',
+  javascript: {
+    bg: '#1e1e2e',
+    accent: '#f7df1e',
+    accent2: '#ffbd2a',
+    code: '{ }',
+    symbol: '//',
   },
-  'html5': {
-    gradient: 'linear-gradient(135deg, #1a0a00 0%, #2d1810 50%, #4a2520 100%)',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg',
-    color: '#e34f26',
-    accent: '#f06529',
+  vue: {
+    bg: '#0f172a',
+    accent: '#42b883',
+    accent2: '#35495e',
+    code: '< >',
+    symbol: '=>',
   },
-  'css': {
-    gradient: 'linear-gradient(135deg, #0a0a2e 0%, #101040 50%, #1a1a60 100%)',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg',
-    color: '#1572b6',
-    accent: '#33a9dc',
+  html5: {
+    bg: '#1a0a05',
+    accent: '#e44d26',
+    accent2: '#f16529',
+    code: '</>',
+    symbol: '#',
   },
-  'vue': {
-    gradient: 'linear-gradient(135deg, #0a1a0a 0%, #102010 50%, #1a3018 100%)',
-    icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vuejs/vuejs-original.svg',
-    color: '#4fc08d',
-    accent: '#35495e',
+  css: {
+    bg: '#0a1030',
+    accent: '#264de4',
+    accent2: '#2965f1',
+    code: '{ }',
+    symbol: '.',
+  },
+  mysql: {
+    bg: '#0a1f2e',
+    accent: '#00758f',
+    accent2: '#f29111',
+    code: 'SQL',
+    symbol: '>>',
   },
 }
 
-const FALLBACK_COVER = {
-  gradient: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-  icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg',
-  color: '#f7df1e',
-  accent: '#323330',
-}
+const FALLBACK_COVER = LANG_COVERS.javascript
 
 const getLangFromTags = (tags) => {
   if (!Array.isArray(tags) || tags.length === 0) return 'javascript'
@@ -103,51 +112,30 @@ const getLangFromTags = (tags) => {
   if (lowerTags.includes('vue')) return 'vue'
   if (lowerTags.includes('html5') || lowerTags.includes('html')) return 'html5'
   if (lowerTags.includes('css')) return 'css'
+  if (lowerTags.includes('mysql')) return 'mysql'
   return 'javascript'
 }
 
-const generateCoverSVG = (slug, coverConfig) => {
-  const title = extractTitleFromSlug(slug)
-  const { gradient, icon, color, accent } = coverConfig
-  const gradientStr = encodeURIComponent(gradient)
-  
-  return `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
-      <defs>
-        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#1a1a2e"/>
-          <stop offset="50%" style="stop-color:#16213e"/>
-          <stop offset="100%" style="stop-color:#0f3460"/>
-        </linearGradient>
-        <filter id="glow">
-          <feGaussianBlur stdDeviation="4" result="blur"/>
-          <feMerge>
-            <feMergeNode in="blur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-      <rect width="800" height="400" fill="url(#bg)"/>
-      <!-- Decorative circles -->
-      <circle cx="120" cy="80" r="60" fill="${color}" opacity="0.08"/>
-      <circle cx="680" cy="320" r="80" fill="${color}" opacity="0.06"/>
-      <circle cx="700" cy="60" r="40" fill="${accent}" opacity="0.1"/>
-      <circle cx="100" cy="340" r="50" fill="${accent}" opacity="0.08"/>
-      <!-- JS Logo placeholder -->
-      <rect x="320" y="100" width="160" height="160" rx="20" fill="${color}" opacity="0.95"/>
-      <text x="400" y="215" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="#1a1a2e" text-anchor="middle">JS</text>
-      <!-- Title text -->
-      <text x="400" y="320" font-family="Arial, sans-serif" font-size="22" fill="rgba(255,255,255,0.7)" text-anchor="middle">${title}</text>
-      <!-- Bottom accent line -->
-      <rect x="300" y="340" width="200" height="3" rx="1.5" fill="${color}" opacity="0.6"/>
-    </svg>`
-  )}`
+const getCoverConfig = (tags) => {
+  const lang = getLangFromTags(tags)
+  return LANG_COVERS[lang] || FALLBACK_COVER
 }
 
-const getCoverUrl = (slug, tags) => {
-  const lang = getLangFromTags(tags)
-  const coverConfig = LANG_COVERS[lang] || FALLBACK_COVER
-  return generateCoverSVG(slug, coverConfig)
+// 分类图标和颜色配置
+const CATEGORY_CONFIG = {
+  'JavaScript': { icon: 'JS', color: '#f7df1e' },
+  'MySQL': { icon: 'SQL', color: '#00758f' },
+}
+
+const getCategoryConfig = (name) => {
+  if (CATEGORY_CONFIG[name]) {
+    return CATEGORY_CONFIG[name]
+  }
+  // 为未知分类生成默认配置
+  return {
+    icon: name.substring(0, 2).toUpperCase(),
+    color: '#42b883'
+  }
 }
 
 export const loadManifest = async () => {
@@ -167,9 +155,13 @@ export const loadManifest = async () => {
 export const loadPost = async (slug) => {
   if (cache.value[slug]) return cache.value[slug]
   
-  const resp = await fetch(POSTS_DIR + encodeURIComponent(slug) + '.md')
+  // 对路径中的每一部分分别编码，保留斜杠
+  const encodedSlug = slug.split('/').map(part => encodeURIComponent(part)).join('/')
+  const url = POSTS_DIR + encodedSlug + '.md'
+  
+  const resp = await fetch(url)
   if (!resp.ok) {
-    console.error('Failed to fetch post:', slug, 'URL:', POSTS_DIR + encodeURIComponent(slug) + '.md')
+    console.error('Failed to fetch post:', slug, 'URL:', url)
     throw new Error('无法加载文章：' + slug)
   }
   
@@ -178,17 +170,19 @@ export const loadPost = async (slug) => {
   const parsed = parseFrontmatter(text)
   const meta = parsed.meta
   
-  ensureTagsArray(meta)
-  
   const date = meta.date || extractDateFromSlug(slug)
+  // 从文件夹路径获取分类作为 tag
+  const category = extractCategoryFromSlug(slug)
   
   const post = {
     slug,
     title: meta.title || extractTitleFromSlug(slug),
     date: date,
-    tags: meta.tags,
+    tags: [category], // 使用文件夹名作为唯一 tag
+    category: category,
     summary: meta.summary || '',
-    cover: meta.cover || getCoverUrl(slug, meta.tags),
+    cover: meta.cover || null,
+    coverConfig: getCoverConfig([category]),
     markdown: parsed.content
   }
   
@@ -204,4 +198,29 @@ export const loadAllPosts = async () => {
   
   posts.sort((a, b) => new Date(b.date) - new Date(a.date))
   return posts
+}
+
+// 获取所有分类（基于文件夹）
+export const getCategories = async () => {
+  const manifest = await loadManifest()
+  const categories = new Map()
+  
+  manifest.posts.forEach(slug => {
+    const category = extractCategoryFromSlug(slug)
+    if (categories.has(category)) {
+      categories.set(category, categories.get(category) + 1)
+    } else {
+      categories.set(category, 1)
+    }
+  })
+  
+  return Array.from(categories.entries()).map(([name, count]) => {
+    const config = getCategoryConfig(name)
+    return {
+      name,
+      count,
+      icon: config.icon,
+      color: config.color
+    }
+  })
 }
