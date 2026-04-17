@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -55,3 +56,6 @@ out/
 # OS
 Thumbs.db
 .DS_Store
+=======
+.
+>>>>>>> 959465a7243c8bae4edd9cd006b04438d9c3454e
