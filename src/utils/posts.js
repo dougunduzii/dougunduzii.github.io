@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const POSTS_DIR = '/blog/posts/'
+const POSTS_DIR = '/posts/'
 
 const parseFrontmatter = (text) => {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/)

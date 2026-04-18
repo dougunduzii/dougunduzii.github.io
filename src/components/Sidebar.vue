@@ -7,22 +7,32 @@ const router = useRouter()
 
 const userInfo = {
   nickname: '豆根杜子',
-  avatar: '/blog/boy.png',
+  avatar: '/boy.png',
   bio: '热爱编程，分享技术心得',
   postCount: 20,
 }
 
 const categories = ref([])
 const loading = ref(true)
+const error = ref(null)
 
 onMounted(async () => {
   try {
-    categories.value = await getCategories()
+    console.log('开始加载分类...')
+    const result = await getCategories()
+    console.log('分类加载成功:', result)
+    categories.value = result
+    if (result.length === 0) {
+      error.value = '暂无分类数据'
+    }
   } catch (err) {
     console.error('加载分类失败:', err)
-    // 兜底数据
+    error.value = err.message || '加载失败'
+    // 兜底数据 - 包含所有三个分类
     categories.value = [
       { name: 'JavaScript', count: 15, icon: 'JS', color: '#f7df1e' },
+      { name: 'MySQL', count: 3, icon: 'SQL', color: '#00758f' },
+      { name: '算法', count: 2, icon: '算', color: '#e74c3c' },
     ]
   } finally {
     loading.value = false
@@ -51,7 +61,8 @@ const filterByCategory = (categoryName) => {
     <nav class="sidebar-nav">
       <h4 class="sidebar-section-title">分类</h4>
       <div v-if="loading" class="loading">加载中...</div>
-      <ul v-else class="sidebar-category-list">
+      <div v-else-if="error" class="error">{{ error }}</div>
+      <ul v-else-if="categories.length > 0" class="sidebar-category-list">
         <li 
           v-for="cat in categories" 
           :key="cat.name"
@@ -160,6 +171,13 @@ const filterByCategory = (categoryName) => {
   text-align: center;
   color: var(--color-text-secondary);
   font-size: 0.9rem;
+  padding: 20px 0;
+}
+
+.error {
+  text-align: center;
+  color: #e74c3c;
+  font-size: 0.85rem;
   padding: 20px 0;
 }
 
