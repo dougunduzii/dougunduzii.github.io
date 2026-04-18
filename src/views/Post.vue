@@ -115,9 +115,21 @@ const renderMarkdown = (markdown) => {
     return emojiMap[emoji] || match
   })
   
-  // 处理图片路径：将相对路径 ./picture/ 转换为绝对路径 /posts/JavaScript/picture/
-  // 因为 markdown 文件在 posts/JavaScript/ 子文件夹中，picture 也在同一目录
-  processedMarkdown = processedMarkdown.replace(/!\[(.*?)\]\(\.\.?\/picture\/(.*?)\)/g, '![$1](/posts/JavaScript/picture/$2)')
+  // 获取文章分类，用于构建正确的图片路径
+  const category = post.value?.category || 'JavaScript'
+  
+  // 处理 Markdown 格式图片路径：将相对路径 ./picture/ 转换为绝对路径 /posts/{category}/picture/
+  processedMarkdown = processedMarkdown.replace(
+    /!\[(.*?)\]\(\.\.?\/picture\/(.*?)\)/g, 
+    `![$1](/posts/${category}/picture/$2)`
+  )
+  
+  // 处理 HTML 格式图片路径：<img src="./picture/..."> 转换为 <img src="/posts/{category}/picture/...">
+  processedMarkdown = processedMarkdown.replace(
+    /<img([^>]*?)src=["']\.\.?\/picture\/([^"']+)["']([^>]*)>/g, 
+    `<img$1src="/posts/${category}/picture/$2"$3>`
+  )
+  
   processedMarkdown = processedMarkdown.replace(/\|\s*\.\.\s*\|\s*\.\.\s*\|/g, '| --- | --- |')
   
   return marked.parse(processedMarkdown, {
