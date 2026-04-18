@@ -8,7 +8,7 @@ const router = useRouter()
 const userInfo = {
   nickname: '豆根杜子',
   avatar: '/boy.png',
-  bio: '热爱编程，分享技术心得',
+  bio: '我是小菜狗  大佬带带我',
   postCount: 20,
 }
 

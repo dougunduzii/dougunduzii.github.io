@@ -106,8 +106,8 @@ onMounted(async () => {
   <div>
     <section class="hero">
       <div class="container">
-        <h1>记录技术与生活</h1>
-        <p>在这里分享我的编程心得、技术探索和生活感悟</p>
+        <h1>求大佬带我</h1>
+        <p>我是小菜狗</p>
         <div class="search-box">
           <span class="search-icon">🔍</span>
           <input 
