@@ -1,71 +1,132 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+import { marked } from 'marked'
+import hljs from 'highlight.js'
+
+const markdownContent = ref('')
+const loading = ref(true)
+const error = ref(null)
+
+// 配置 marked
+marked.setOptions({
+  highlight: function(code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(code, { language: lang }).value
+    }
+    return hljs.highlightAuto(code).value
+  },
+  breaks: true
+})
+
+onMounted(async () => {
+  try {
+    const resp = await fetch('/about.md')
+    if (!resp.ok) {
+      throw new Error('无法加载 about.md')
+    }
+    const text = await resp.text()
+    markdownContent.value = marked.parse(text)
+  } catch (err) {
+    console.error('加载 about.md 失败:', err)
+    error.value = err.message
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
   <div class="about-page">
     <div class="container">
-      <div class="about-hero">
-        <div class="avatar-placeholder"><img src="/boy.png"></div>
-        <h1>你好，我是一名开发者</h1>
-        <p class="about-subtitle">热爱编程，热爱生活，用代码改变世界</p>
+      <div v-if="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
       </div>
-
-      <div class="about-content">
-        <section class="about-section">
-          <h2>关于我</h2>
-          <p>我是一名充满热情的前端开发者，对 Web 技术有着浓厚的兴趣。从第一次写出 "Hello World" 开始，我就被编程的魅力深深吸引。</p>
-          <p>我相信技术的力量可以让世界变得更美好。在工作之余，我喜欢通过写博客来分享我的学习心得和技术见解，也希望通过这种方式与更多志同道合的朋友交流。</p>
-        </section>
-
-        <section class="about-section">
-          <h2>技术栈</h2>
-          <div class="skill-grid">
-            <div class="skill-item">
-              <span class="skill-icon">🎨</span>
-              <span class="skill-name">HTML / CSS</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-icon">⚡</span>
-              <span class="skill-name">JavaScript</span>
-            </div>
-            <div class="skill-item">
-              <span class="skill-icon">🐍</span>
-              <span class="skill-name">Python</span>
-            </div>
-          </div>
-        </section>
-
-        <section class="about-section">
-          <h2>兴趣爱好</h2>
-          <div class="hobby-list">
-            <div class="hobby-item">
-              <span>🎶</span>
-              <p>Jay Chou</p>
-            </div>
-            <div class="hobby-item">
-              <span>🐭</span>
-              <p>宅家</p>
-            </div></div>
-            </section>
-
-        <section class="about-section">
-          <h2>联系方式</h2>
-          <div class="contact-links">
-            <a href="#" class="contact-item">
-              <span>📧</span>
-              <span>hello@myblog.com</span>
-            </a>
-            <a href="#" class="contact-item">
-              <span>🐙</span>
-              <span>GitHub</span>
-            </a>
-            <a href="#" class="contact-item">
-              <span>🐦</span>
-              <span>Twitter</span>
-            </a>
-          </div>
-        </section>
+      
+      <div v-else-if="error" class="error">
+        <p>加载失败: {{ error }}</p>
       </div>
+      
+      <div v-else class="about-content markdown-body" v-html="markdownContent"></div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.about-page {
+  padding: 40px 0;
+  min-height: calc(100vh - 68px);
+}
+
+.about-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 40px;
+  border: 1px solid var(--color-border);
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  text-align: center;
+  padding: 60px 0;
+  color: #e74c3c;
+}
+
+/* Markdown 样式 */
+.markdown-body :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.markdown-body :deep(h2) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 32px 0 16px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 8px;
+}
+
+.markdown-body :deep(ul) {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.markdown-body :deep(li) {
+  margin: 8px 0;
+  color: var(--color-text-secondary);
+}
+
+.markdown-body :deep(p) {
+  margin: 16px 0;
+  line-height: 1.8;
+  color: var(--color-text);
+}
+
+@media (max-width: 768px) {
+  .about-content {
+    padding: 24px;
+  }
+}
+</style>
