@@ -115,9 +115,9 @@ const renderMarkdown = (markdown) => {
     return emojiMap[emoji] || match
   })
   
-  // 处理图片路径：将相对路径 ./picture/ 转换为绝对路径 /blog/posts/JavaScript/picture/
+  // 处理图片路径：将相对路径 ./picture/ 转换为绝对路径 /posts/JavaScript/picture/
   // 因为 markdown 文件在 posts/JavaScript/ 子文件夹中，picture 也在同一目录
-  processedMarkdown = processedMarkdown.replace(/!\[(.*?)\]\(\.\.?\/picture\/(.*?)\)/g, '![$1](/blog/posts/JavaScript/picture/$2)')
+  processedMarkdown = processedMarkdown.replace(/!\[(.*?)\]\(\.\.?\/picture\/(.*?)\)/g, '![$1](/posts/JavaScript/picture/$2)')
   processedMarkdown = processedMarkdown.replace(/\|\s*\.\.\s*\|\s*\.\.\s*\|/g, '| --- | --- |')
   
   return marked.parse(processedMarkdown, {
