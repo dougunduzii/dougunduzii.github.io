@@ -4,7 +4,6 @@
 <template>
   <footer class="footer">
     <div class="container">
-      <p>&copy; 2026 我的博客 · 用文字记录成长</p>
     </div>
   </footer>
 </template>
