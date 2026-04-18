@@ -102,6 +102,13 @@ const LANG_COVERS = {
     code: 'SQL',
     symbol: '>>',
   },
+  algorithm: {
+    bg: '#1a0a0a',
+    accent: '#e74c3c',
+    accent2: '#c0392b',
+    code: 'O(n)',
+    symbol: 'Ω',
+  },
 }
 
 const FALLBACK_COVER = LANG_COVERS.javascript
@@ -113,6 +120,7 @@ const getLangFromTags = (tags) => {
   if (lowerTags.includes('html5') || lowerTags.includes('html')) return 'html5'
   if (lowerTags.includes('css')) return 'css'
   if (lowerTags.includes('mysql')) return 'mysql'
+  if (lowerTags.includes('算法') || lowerTags.includes('algorithm')) return 'algorithm'
   return 'javascript'
 }
 
@@ -125,6 +133,7 @@ const getCoverConfig = (tags) => {
 const CATEGORY_CONFIG = {
   'JavaScript': { icon: 'JS', color: '#f7df1e' },
   'MySQL': { icon: 'SQL', color: '#00758f' },
+  '算法': { icon: '算', color: '#e74c3c' },
 }
 
 const getCategoryConfig = (name) => {
