@@ -77,7 +77,7 @@ const loadPostData = async (slug) => {
   
   try {
     post.value = await loadPost(slug)
-    document.title = `${post.value.title} - 我的博客`
+    document.title = `${post.value.title}`
   } catch (err) {
     notFound.value = true
     document.title = '文章未找到 - 我的博客'
