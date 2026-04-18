@@ -4,6 +4,7 @@
 <template>
   <footer class="footer">
     <div class="container">
+      <p>页面结构为AI生成</p>
     </div>
   </footer>
 </template>
