@@ -65,55 +65,51 @@ const extractTitleFromSlug = (slug) => {
 
 const cache = ref({})
 
-// 编程语言封面配置 - 使用代码主题色 + 装饰元素
+// 编程语言封面配置 - 使用Logo图片URL
 const LANG_COVERS = {
   javascript: {
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg',
     bg: '#1e1e2e',
     accent: '#f7df1e',
-    accent2: '#ffbd2a',
-    code: '{ }',
-    symbol: '//',
   },
   vue: {
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg',
     bg: '#0f172a',
     accent: '#42b883',
-    accent2: '#35495e',
-    code: '< >',
-    symbol: '=>',
   },
   html5: {
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg',
     bg: '#1a0a05',
     accent: '#e44d26',
-    accent2: '#f16529',
-    code: '</>',
-    symbol: '#',
   },
   css: {
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg',
     bg: '#0a1030',
     accent: '#264de4',
-    accent2: '#2965f1',
-    code: '{ }',
-    symbol: '.',
   },
   mysql: {
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
     bg: '#0a1f2e',
     accent: '#00758f',
-    accent2: '#f29111',
-    code: 'SQL',
-    symbol: '>>',
   },
   algorithm: {
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg',
     bg: '#1a0a0a',
     accent: '#e74c3c',
-    accent2: '#c0392b',
-    code: 'O(n)',
-    symbol: 'Ω',
   },
 }
 
 const FALLBACK_COVER = LANG_COVERS.javascript
 
-const getLangFromTags = (tags) => {
+const getLangFromTags = (tags, category) => {
+  // 优先使用分类（文件夹名）来判断
+  if (category) {
+    const lowerCategory = category.toLowerCase()
+    if (lowerCategory === 'mysql') return 'mysql'
+    if (lowerCategory === '算法' || lowerCategory === 'algorithm') return 'algorithm'
+    if (lowerCategory === 'javascript') return 'javascript'
+  }
+  // 备用：使用tags判断
   if (!Array.isArray(tags) || tags.length === 0) return 'javascript'
   const lowerTags = tags.map(t => t.toLowerCase())
   if (lowerTags.includes('vue')) return 'vue'
@@ -124,8 +120,8 @@ const getLangFromTags = (tags) => {
   return 'javascript'
 }
 
-const getCoverConfig = (tags) => {
-  const lang = getLangFromTags(tags)
+const getCoverConfig = (tags, category) => {
+  const lang = getLangFromTags(tags, category)
   return LANG_COVERS[lang] || FALLBACK_COVER
 }
 
@@ -191,7 +187,7 @@ export const loadPost = async (slug) => {
     category: category,
     summary: meta.summary || '',
     cover: meta.cover || null,
-    coverConfig: getCoverConfig([category]),
+    coverConfig: getCoverConfig([category], category),
     markdown: parsed.content
   }
   

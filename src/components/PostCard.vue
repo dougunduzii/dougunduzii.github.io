@@ -25,10 +25,9 @@ const formatDate = (dateStr) => {
 }
 
 const getCoverStyle = (post) => {
-  if (post.cover) return { backgroundImage: `url(${post.cover})` }
   const config = post.coverConfig || {}
   return {
-    background: `linear-gradient(135deg, ${config.bg || '#1e1e2e'} 0%, ${config.accent2 || '#2a2a3e'} 100%)`,
+    background: `linear-gradient(135deg, ${config.bg || '#1e1e2e'} 0%, ${darkenColor(config.bg || '#1e1e2e', 20)} 100%)`,
   }
 }
 
@@ -37,19 +36,19 @@ const getAccentColor = (post) => {
   return config.accent || '#f7df1e'
 }
 
-const getCodeSymbol = (post) => {
+const getLogoUrl = (post) => {
   const config = post.coverConfig || {}
-  return config.code || '{ }'
+  return config.logo || 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg'
 }
 
-const getSymbol1 = (post) => {
-  const config = post.coverConfig || {}
-  return config.symbol || '//'
-}
-
-const getSymbol2 = (post) => {
-  const config = post.coverConfig || {}
-  return config.accent2 || '#ffbd2a'
+// 辅助函数：加深颜色
+const darkenColor = (hex, percent) => {
+  const num = parseInt(hex.replace('#', ''), 16)
+  const amt = Math.round(2.55 * percent)
+  const R = Math.max((num >> 16) - amt, 0)
+  const G = Math.max((num >> 8 & 0x00FF) - amt, 0)
+  const B = Math.max((num & 0x0000FF) - amt, 0)
+  return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)
 }
 </script>
 
@@ -57,19 +56,15 @@ const getSymbol2 = (post) => {
   <article class="post-card">
     <div class="post-card-cover-wrap">
       <div class="post-card-cover" :style="getCoverStyle(post)">
-        <div v-if="!post.cover" class="post-card-cover-content">
-          <div class="post-card-cover-code" :style="{ color: getAccentColor(post) }">
-            <span class="code-symbol">{{ getCodeSymbol(post) }}</span>
-          </div>
-          <div class="post-card-cover-decorators">
-            <span class="decorator d1" :style="{ color: getAccentColor(post) }">{{ getSymbol1(post) }}</span>
-            <span class="decorator d2" :style="{ color: getAccentColor(post) }">( )</span>
-            <span class="decorator d3" :style="{ color: getSymbol2(post) }">=</span>
-            <span class="decorator d4" :style="{ color: getAccentColor(post) }">;</span>
-            <span class="decorator d5" :style="{ color: getSymbol2(post) }">{{ getSymbol1(post) }}</span>
-          </div>
+        <div class="post-card-cover-content">
+          <img 
+            class="post-card-logo" 
+            :src="getLogoUrl(post)" 
+            :alt="post.category"
+            :style="{ filter: `drop-shadow(0 0 20px ${getAccentColor(post)}40)` }"
+          />
         </div>
-        <div class="post-card-cover-shine" :style="{ background: `linear-gradient(105deg, transparent 40%, ${getAccentColor(post)}10 50%, transparent 60%)` }"></div>
+        <div class="post-card-cover-shine" :style="{ background: `linear-gradient(105deg, transparent 40%, ${getAccentColor(post)}15 50%, transparent 60%)` }"></div>
       </div>
       <div class="post-card-cover-overlay"></div>
     </div>
@@ -149,33 +144,20 @@ const getSymbol2 = (post) => {
   position: relative;
   z-index: 1;
   text-align: center;
-}
-
-.post-card-cover-code {
-  font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
-  font-size: 3.5rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-shadow: 0 0 30px currentColor;
-  margin-bottom: 12px;
-}
-
-.post-card-cover-decorators {
   display: flex;
-  gap: 18px;
-  justify-content: center;
   align-items: center;
-  font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
-  font-size: 1.1rem;
+  justify-content: center;
 }
 
-.decorator {
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
+.post-card-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.post-card:hover .decorator {
-  opacity: 0.8;
+.post-card:hover .post-card-logo {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .post-card-cover-shine {
@@ -265,13 +247,9 @@ const getSymbol2 = (post) => {
     height: 180px;
   }
   
-  .post-card-cover-code {
-    font-size: 2.8rem;
-  }
-
-  .post-card-cover-decorators {
-    font-size: 0.9rem;
-    gap: 12px;
+  .post-card-logo {
+    width: 64px;
+    height: 64px;
   }
 
   .post-card-body {
