@@ -204,10 +204,12 @@ watch(() => route.params.slug, (newSlug) => {
             </div>
           </header>
 
-          <div 
-            class="post-detail-content" 
-            v-html="renderMarkdown(post.markdown)"
-          ></div>
+          <div class="post-detail-content-wrapper">
+            <div 
+              class="post-detail-content" 
+              v-html="renderMarkdown(post.markdown)"
+            ></div>
+          </div>
 
           <footer class="post-detail-footer">
             <RouterLink to="/" class="back-link">← 返回首页</RouterLink>
@@ -325,9 +327,16 @@ watch(() => route.params.slug, (newSlug) => {
   font-weight: 500;
 }
 
-.post-detail-content {
-  max-width: 720px;
+.post-detail-content-wrapper {
+  max-width: 800px;
   margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 40px;
+  border: 1px solid var(--color-border);
+}
+
+.post-detail-content {
   font-size: 1.08rem;
   line-height: 1.9;
   color: var(--color-text);
@@ -495,11 +504,11 @@ watch(() => route.params.slug, (newSlug) => {
   .post-detail-cover {
     height: 200px;
   }
-  
+
   .post-detail-cover-code {
     font-size: 3rem;
   }
-  
+
   .post-detail-cover-decorators {
     font-size: 1rem;
     gap: 14px;
@@ -508,7 +517,11 @@ watch(() => route.params.slug, (newSlug) => {
   .post-detail-title {
     font-size: 1.8rem;
   }
-  
+
+  .post-detail-content-wrapper {
+    padding: 24px;
+  }
+
   .post-detail-content {
     font-size: 1rem;
   }
