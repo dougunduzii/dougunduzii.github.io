@@ -142,9 +142,7 @@ const progress = computed(() => {
         ></audio>
         <div class="music-info">
           <div class="music-cover" :class="{ playing: isPlaying }">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-            </svg>
+            <img src="https://y.gtimg.cn/music/photo_new/T002R300x300M000002eFUFm2XYZ7z.jpg" alt="蒲公英的约定" />
           </div>
           <div class="music-meta">
             <span class="music-title">蒲公英的约定</span>
@@ -347,18 +345,20 @@ const progress = computed(() => {
 }
 
 .music-cover {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
+  overflow: hidden;
   flex-shrink: 0;
 }
 
-.music-cover.playing {
+.music-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.music-cover.playing img {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
