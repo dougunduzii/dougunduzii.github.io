@@ -173,7 +173,7 @@ const progress = computed(() => {
 .sidebar {
   width: 280px;
   height: calc(100vh - 68px);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(248, 249, 251, 0.85);
   backdrop-filter: blur(20px);
   border-right: 1px solid var(--color-border);
   padding: 40px 24px;
@@ -185,6 +185,11 @@ const progress = computed(() => {
   top: 68px;
   z-index: 90;
   overflow-y: auto;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+[data-theme="dark"] .sidebar {
+  background: rgba(12, 14, 20, 0.85);
 }
 
 .sidebar-profile {
