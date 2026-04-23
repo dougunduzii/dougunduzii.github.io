@@ -9,8 +9,9 @@ const userInfo = {
   nickname: '豆根杜子',
   avatar: '/boy.png',
   bio: '我是小菜狗  大佬带带我',
-  postCount: 20,
 }
+
+const postCount = computed(() => categories.value.reduce((sum, cat) => sum + cat.count, 0))
 
 const categories = ref([])
 const loading = ref(true)
@@ -105,7 +106,7 @@ const progress = computed(() => {
       <p class="sidebar-bio">{{ userInfo.bio }}</p>
       <div class="sidebar-stats">
         <span class="stat-item">
-          <span class="stat-count">{{ userInfo.postCount }}</span>
+          <span class="stat-count">{{ postCount }}</span>
           <span class="stat-label">文章</span>
         </span>
       </div>
