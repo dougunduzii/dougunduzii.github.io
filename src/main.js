@@ -6,11 +6,13 @@ import './styles/main.css'
 import Home from './views/Home.vue'
 import Post from './views/Post.vue'
 import About from './views/About.vue'
+import TodoList from './views/TodoList.vue'
 
 const routes = [
   { path: '/', component: Home },
   { path: '/post/:slug(.*)', component: Post },
-  { path: '/about', component: About }
+  { path: '/about', component: About },
+  { path: '/todo', component: TodoList }
 ]
 
 const router = createRouter({

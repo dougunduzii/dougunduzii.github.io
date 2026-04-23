@@ -18,6 +18,7 @@ const menuOpen = ref(false)
       <div class="nav-right">
         <ul class="nav-links" :class="{ open: menuOpen }">
           <li><RouterLink to="/" exact-active-class="active">首页</RouterLink></li>
+          <li><RouterLink to="/todo" active-class="active">To Do List</RouterLink></li>
           <li><RouterLink to="/about" active-class="active">关于</RouterLink></li>
         </ul>
         
