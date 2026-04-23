@@ -17,7 +17,7 @@ NJUPTer level 2025
 
 ## 🐾What I am trying
 <ul>
-  <li>MySQL</li>
+  <li>TypeScript</li>
 </ul>
 
 ## 🥰Contact me

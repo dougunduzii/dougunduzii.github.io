@@ -47,6 +47,7 @@ const isPlaying = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
 const audioRef = ref(null)
+let lastTimeUpdate = 0
 
 const togglePlay = () => {
   if (!audioRef.value) return
@@ -60,6 +61,9 @@ const togglePlay = () => {
 
 const onTimeUpdate = () => {
   if (!audioRef.value) return
+  const now = performance.now()
+  if (now - lastTimeUpdate < 250) return
+  lastTimeUpdate = now
   currentTime.value = audioRef.value.currentTime
 }
 
@@ -134,7 +138,7 @@ const progress = computed(() => {
       <div class="music-card">
         <audio 
           ref="audioRef"
-          :src="'/' + encodeURIComponent('周杰伦 - 蒲公英的约定') + '.flac'"
+          :src="'/' + encodeURIComponent('周杰伦 - 蒲公英的约定') + '.mp3'"
           @timeupdate="onTimeUpdate"
           @loadedmetadata="onLoadedMetadata"
           @ended="onEnded"
