@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCategories } from '../utils/posts.js'
 
@@ -42,6 +42,55 @@ onMounted(async () => {
 const filterByCategory = (categoryName) => {
   router.push({ path: '/', query: { tag: categoryName } })
 }
+
+const isPlaying = ref(false)
+const currentTime = ref(0)
+const duration = ref(0)
+const audioRef = ref(null)
+
+const togglePlay = () => {
+  if (!audioRef.value) return
+  if (isPlaying.value) {
+    audioRef.value.pause()
+  } else {
+    audioRef.value.play()
+  }
+  isPlaying.value = !isPlaying.value
+}
+
+const onTimeUpdate = () => {
+  if (!audioRef.value) return
+  currentTime.value = audioRef.value.currentTime
+}
+
+const onLoadedMetadata = () => {
+  if (!audioRef.value) return
+  duration.value = audioRef.value.duration
+}
+
+const onEnded = () => {
+  isPlaying.value = false
+  currentTime.value = 0
+}
+
+const seekTo = (e) => {
+  if (!audioRef.value || !duration.value) return
+  const rect = e.currentTarget.getBoundingClientRect()
+  const ratio = (e.clientX - rect.left) / rect.width
+  audioRef.value.currentTime = ratio * duration.value
+}
+
+const formatTime = (seconds) => {
+  if (!seconds || isNaN(seconds)) return '0:00'
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+const progress = computed(() => {
+  if (!duration.value) return 0
+  return (currentTime.value / duration.value) * 100
+})
 </script>
 
 <template>
@@ -80,6 +129,45 @@ const filterByCategory = (categoryName) => {
         </li>
       </ul>
     </nav>
+
+    <div class="sidebar-music">
+      <div class="music-card">
+        <audio 
+          ref="audioRef"
+          :src="'/' + encodeURIComponent('周杰伦 - 蒲公英的约定') + '.flac'"
+          @timeupdate="onTimeUpdate"
+          @loadedmetadata="onLoadedMetadata"
+          @ended="onEnded"
+          preload="metadata"
+        ></audio>
+        <div class="music-info">
+          <div class="music-cover" :class="{ playing: isPlaying }">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+            </svg>
+          </div>
+          <div class="music-meta">
+            <span class="music-title">蒲公英的约定</span>
+            <span class="music-artist">周杰伦</span>
+          </div>
+          <button class="music-btn" @click="togglePlay">
+            <svg v-if="!isPlaying" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg v-else viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="music-progress" @click="seekTo">
+          <div class="music-progress-bar" :style="{ width: progress + '%' }"></div>
+        </div>
+        <div class="music-time">
+          <span>{{ formatTime(currentTime) }}</span>
+          <span>{{ formatTime(duration) }}</span>
+        </div>
+      </div>
+    </div>
   </aside>
 </template>
 
@@ -236,5 +324,113 @@ const filterByCategory = (categoryName) => {
 
 @media (max-width: 768px) {
   .sidebar { display: none; }
+}
+
+.sidebar-music {
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+  margin-top: auto;
+}
+
+.music-card {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  padding: 14px;
+  background: var(--color-surface);
+}
+
+.music-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.music-cover {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.music-cover.playing {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.music-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.music-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-artist {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+.music-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.music-btn:hover {
+  transform: scale(1.1);
+  background: var(--color-primary-dark);
+}
+
+.music-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--color-tag-bg);
+  border-radius: 2px;
+  margin-top: 12px;
+  cursor: pointer;
+  position: relative;
+}
+
+.music-progress-bar {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.music-time {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 0.7rem;
+  color: var(--color-text-tertiary);
 }
 </style>
