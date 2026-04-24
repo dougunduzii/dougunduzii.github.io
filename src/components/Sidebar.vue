@@ -8,7 +8,7 @@ const router = useRouter()
 const userInfo = {
   nickname: '豆根杜子',
   avatar: '/boy.png',
-  bio: '我是小菜狗  大佬带带我',
+  bio: ' ',
 }
 
 const postCount = computed(() => categories.value.reduce((sum, cat) => sum + cat.count, 0))
