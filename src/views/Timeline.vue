@@ -232,7 +232,7 @@ onMounted(async () => {
   align-items: center;
   gap: 14px;
   position: relative;
-  margin-bottom: 50px;
+  margin-bottom: 100px;
   cursor: pointer;
 }
 
