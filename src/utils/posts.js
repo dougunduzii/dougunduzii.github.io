@@ -97,6 +97,11 @@ const LANG_COVERS = {
     bg: '#1a0a0a',
     accent: '#e74c3c',
   },
+  typescript: {
+    logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
+    bg: '#1a1a2e',
+    accent: '#3178c6',
+  },
 }
 
 const FALLBACK_COVER = LANG_COVERS.javascript
@@ -108,10 +113,12 @@ const getLangFromTags = (tags, category) => {
     if (lowerCategory === 'mysql') return 'mysql'
     if (lowerCategory === '算法' || lowerCategory === 'algorithm') return 'algorithm'
     if (lowerCategory === 'javascript') return 'javascript'
+    if (lowerCategory === 'typescript') return 'typescript'
   }
   // 备用：使用tags判断
   if (!Array.isArray(tags) || tags.length === 0) return 'javascript'
   const lowerTags = tags.map(t => t.toLowerCase())
+  if (lowerTags.includes('typescript')) return 'typescript'
   if (lowerTags.includes('vue')) return 'vue'
   if (lowerTags.includes('html5') || lowerTags.includes('html')) return 'html5'
   if (lowerTags.includes('css')) return 'css'
@@ -128,6 +135,7 @@ const getCoverConfig = (tags, category) => {
 // 分类图标和颜色配置
 const CATEGORY_CONFIG = {
   'JavaScript': { icon: 'JS', color: '#f7df1e' },
+  'TypeScript': { icon: 'TS', color: '#3178c6' },
   'MySQL': { icon: 'SQL', color: '#00758f' },
   '算法': { icon: '算', color: '#e74c3c' },
 }

@@ -328,7 +328,7 @@ watch(() => route.params.slug, (newSlug) => {
 }
 
 .post-detail-content-wrapper {
-  max-width: 800px;
+  max-width: 980px;
   margin: 0 auto;
   background: var(--color-surface);
   border-radius: var(--radius);
