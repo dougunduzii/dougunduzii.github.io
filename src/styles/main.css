@@ -392,7 +392,7 @@ img {
   margin: 24px 0;
   font-size: 0.88rem;
   line-height: 1.7;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid var(--color-border);
 }
 
 .post-detail-content code {
@@ -407,7 +407,7 @@ img {
   border-radius: 0;
 }
 
-.post-detail-content p code {
+.post-detail-content :not(pre) > code {
   background: var(--color-inline-code-bg);
   color: var(--color-inline-code-text);
   padding: 2px 7px;

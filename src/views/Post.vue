@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, inject, watch, computed } from 'vue'
+import { ref, onMounted, inject, watch, computed, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { marked } from 'marked'
 import markedKatex from 'marked-katex-extension'
@@ -139,23 +139,109 @@ const renderMarkdown = (markdown) => {
   })
 }
 
+const enhanceCodeBlocks = () => {
+  const content = document.querySelector('.post-detail-content')
+  if (!content) return
+
+  const pres = content.querySelectorAll('pre')
+  pres.forEach(pre => {
+    if (pre.closest('.code-block-wrapper')) return
+
+    const code = pre.querySelector('code')
+    const langClass = code?.className.match(/language-(\w+)/)?.[1]
+    const langName = langClass || 'text'
+
+    const wrapper = document.createElement('div')
+    wrapper.className = 'code-block-wrapper'
+
+    const topbar = document.createElement('div')
+    topbar.className = 'code-block-topbar'
+
+    const leftArea = document.createElement('div')
+    leftArea.className = 'code-block-topbar-left'
+
+    const dots = document.createElement('span')
+    dots.className = 'code-dots'
+    dots.innerHTML = '<i></i><i></i><i></i>'
+
+    const langLabel = document.createElement('span')
+    langLabel.className = 'code-lang-label'
+    langLabel.textContent = langName
+
+    leftArea.appendChild(dots)
+    leftArea.appendChild(langLabel)
+
+    const copyBtn = document.createElement('button')
+    copyBtn.className = 'copy-btn'
+    copyBtn.textContent = 'Copy'
+    copyBtn.addEventListener('click', async () => {
+      const text = code?.textContent || pre.textContent || ''
+      try {
+        await navigator.clipboard.writeText(text)
+        copyBtn.textContent = 'Copied ✓'
+        copyBtn.classList.add('copied')
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy'
+          copyBtn.classList.remove('copied')
+        }, 2000)
+      } catch {
+        copyBtn.textContent = 'Failed ✗'
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy'
+        }, 2000)
+      }
+    })
+
+    topbar.appendChild(leftArea)
+    topbar.appendChild(copyBtn)
+
+    const body = document.createElement('div')
+    body.className = 'code-block-body'
+
+    const text = (code?.textContent || '').replace(/\n$/, '')
+    const lines = text.split('\n')
+    const lineCountEl = document.createElement('div')
+    lineCountEl.className = 'line-numbers'
+    for (let i = 1; i <= Math.max(lines.length, 1); i++) {
+      const span = document.createElement('span')
+      span.textContent = i
+      lineCountEl.appendChild(span)
+    }
+
+    body.appendChild(lineCountEl)
+
+    pre.parentNode.insertBefore(wrapper, pre)
+    wrapper.appendChild(topbar)
+    wrapper.appendChild(body)
+    body.appendChild(pre)
+  })
+}
+
 onMounted(async () => {
   await loadPostData(route.params.slug)
-  
+
   window.addEventListener('scroll', handleScroll, { passive: true })
-  
+
   if (post.value) {
     setTimeout(() => {
       document.querySelectorAll('.post-detail-content pre code').forEach(block => {
         hljs.highlightElement(block)
       })
+      enhanceCodeBlocks()
     }, 0)
   }
 })
 
-watch(() => route.params.slug, (newSlug) => {
+watch(() => route.params.slug, async (newSlug) => {
   if (newSlug) {
-    loadPostData(newSlug)
+    await loadPostData(newSlug)
+    await nextTick()
+    setTimeout(() => {
+      document.querySelectorAll('.post-detail-content pre code').forEach(block => {
+        hljs.highlightElement(block)
+      })
+      enhanceCodeBlocks()
+    }, 0)
   }
 })
 </script>
@@ -342,121 +428,6 @@ watch(() => route.params.slug, (newSlug) => {
   color: var(--color-text);
 }
 
-.post-detail-content h2 {
-  font-size: 1.7rem;
-  font-weight: 700;
-  margin: 48px 0 16px;
-  padding-top: 20px;
-  border-top: 1px solid var(--color-border);
-  letter-spacing: -0.02em;
-  color: var(--color-text);
-}
-
-.post-detail-content h3 {
-  font-size: 1.35rem;
-  font-weight: 600;
-  margin: 32px 0 12px;
-  color: var(--color-text);
-}
-
-.post-detail-content h4 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 24px 0 8px;
-  color: var(--color-text);
-}
-
-.post-detail-content p {
-  margin-bottom: 20px;
-}
-
-.post-detail-content a {
-  color: var(--color-primary);
-  text-decoration: none;
-  transition: color var(--transition);
-}
-
-.post-detail-content a:hover {
-  text-decoration: underline;
-  color: var(--color-primary-dark);
-}
-
-.post-detail-content pre {
-  background: #0d1117;
-  padding: 20px;
-  border-radius: var(--radius-sm);
-  overflow-x: auto;
-  margin: 24px 0;
-  border: 1px solid var(--color-border);
-}
-
-.post-detail-content pre code {
-  background: transparent;
-  padding: 0;
-  font-size: 0.92rem;
-  line-height: 1.65;
-  border: none;
-  color: #c9d1d9;
-}
-
-.post-detail-content code:not(pre code) {
-  background: var(--color-tag-bg);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.88em;
-  color: var(--color-primary);
-}
-
-.post-detail-content ul,
-.post-detail-content ol {
-  margin: 16px 0;
-  padding-left: 24px;
-}
-
-.post-detail-content li {
-  margin-bottom: 8px;
-}
-
-.post-detail-content li::marker {
-  color: var(--color-primary);
-}
-
-.post-detail-content blockquote {
-  border-left: 4px solid var(--color-primary);
-  padding: 18px 24px;
-  margin: 28px 0;
-  background: var(--color-primary-light);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  color: var(--color-text);
-  font-style: italic;
-  font-size: 1.02rem;
-}
-
-.post-detail-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 24px 0;
-  font-size: 0.98rem;
-}
-
-.post-detail-content th,
-.post-detail-content td {
-  padding: 12px 16px;
-  border: 1px solid var(--color-border);
-  text-align: left;
-}
-
-.post-detail-content th {
-  background: var(--color-tag-bg);
-  font-weight: 600;
-}
-
-.post-detail-content img {
-  max-width: 100%;
-  border-radius: var(--radius-sm);
-  margin: 24px 0;
-}
-
 .post-detail-footer {
   margin-top: 60px;
   padding-top: 32px;
@@ -525,5 +496,260 @@ watch(() => route.params.slug, (newSlug) => {
   .post-detail-content {
     font-size: 1rem;
   }
+}
+</style>
+
+<style>
+.post-detail-content h2 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin: 48px 0 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.post-detail-content h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 32px 0 12px;
+  color: var(--color-text);
+}
+
+.post-detail-content h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 24px 0 8px;
+  color: var(--color-text);
+}
+
+.post-detail-content p {
+  margin-bottom: 20px;
+}
+
+.post-detail-content a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.post-detail-content a:hover {
+  text-decoration: underline;
+  color: var(--color-primary-dark);
+}
+
+.post-detail-content .code-block-wrapper {
+  margin: 28px 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #1a1b26;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+}
+
+.post-detail-content .code-block-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, rgba(60, 62, 80, 0.4) 0%, rgba(40, 42, 58, 0.3) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  user-select: none;
+}
+
+.post-detail-content .code-block-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.post-detail-content .code-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.post-detail-content .code-dots i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: block;
+}
+
+.post-detail-content .code-dots i:nth-child(1) { background: #ff5f57; }
+.post-detail-content .code-dots i:nth-child(2) { background: #febc2e; }
+.post-detail-content .code-dots i:nth-child(3) { background: #28c840; }
+
+.post-detail-content .code-lang-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6b7280;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.post-detail-content .copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #9ca3af;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+.post-detail-content .copy-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.post-detail-content .copy-btn.copied {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.25);
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.post-detail-content .code-block-body {
+  display: flex;
+  position: relative;
+}
+
+.post-detail-content .line-numbers {
+  flex-shrink: 0;
+  padding: 16px 0;
+  padding-left: 16px;
+  padding-right: 12px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+  user-select: none;
+  min-width: 36px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.15);
+  counter-reset: line;
+}
+
+.post-detail-content .line-numbers span {
+  display: block;
+  height: calc(14px * 1.6);
+}
+
+.post-detail-content .code-block-body pre {
+  margin: 0;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.post-detail-content .code-block-body pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  border: none;
+  color: var(--color-code-text);
+  white-space: pre;
+  overflow: visible;
+}
+
+.post-detail-content .code-block-body::-webkit-scrollbar,
+.post-detail-content .code-block-body pre::-webkit-scrollbar {
+  height: 6px;
+}
+
+.post-detail-content .code-block-body::-webkit-scrollbar-track,
+.post-detail-content .code-block-body pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.post-detail-content .code-block-body::-webkit-scrollbar-thumb,
+.post-detail-content .code-block-body pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.post-detail-content .code-block-body::-webkit-scrollbar-thumb:hover,
+.post-detail-content .code-block-body pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.post-detail-content code:not(pre code) {
+  background: var(--color-inline-code-bg);
+  color: var(--color-inline-code-text);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: var(--font-mono);
+}
+
+.post-detail-content ul,
+.post-detail-content ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.post-detail-content li {
+  margin-bottom: 8px;
+}
+
+.post-detail-content li::marker {
+  color: var(--color-primary);
+}
+
+.post-detail-content blockquote {
+  border-left: 4px solid var(--color-primary);
+  padding: 18px 24px;
+  margin: 28px 0;
+  background: var(--color-primary-light);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--color-text);
+  font-style: italic;
+  font-size: 1.02rem;
+}
+
+.post-detail-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.98rem;
+}
+
+.post-detail-content th,
+.post-detail-content td {
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.post-detail-content th {
+  background: var(--color-tag-bg);
+  font-weight: 600;
+}
+
+.post-detail-content img {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  margin: 24px 0;
 }
 </style>
