@@ -671,6 +671,13 @@ watch(() => route.params.slug, async (newSlug) => {
   color: var(--color-code-text);
   white-space: pre;
   overflow: visible;
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0, 'calt' 0;
+}
+
+.post-detail-content .code-block-body pre code .hljs-operator,
+.post-detail-content .code-block-body pre code .hljs-literal {
+  color: var(--color-code-text);
 }
 
 .post-detail-content .code-block-body::-webkit-scrollbar,
