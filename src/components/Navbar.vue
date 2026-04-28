@@ -1,10 +1,42 @@
 <script setup>
-import { inject, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { inject, ref, onMounted, computed } from 'vue'
+import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { getCategories } from '../utils/posts.js'
 
 const theme = inject('theme')
 const toggleTheme = inject('toggleTheme')
 const menuOpen = ref(false)
+const learnOpen = ref(false)
+const categories = ref([])
+const router = useRouter()
+const route = useRoute()
+
+onMounted(async () => {
+  try {
+    categories.value = await getCategories()
+    categories.value = categories.value.filter(cat => cat.name !== '碎碎念')
+  } catch {
+    categories.value = []
+  }
+})
+
+const activeTag = computed(() => {
+  const tag = route.query.tag || ''
+  return tag === '碎碎念' ? '' : tag
+})
+
+const isSuiActive = computed(() => {
+  return route.query.tag === '碎碎念'
+})
+
+const learnLabel = computed(() => {
+  return activeTag.value ? `${activeTag.value} ▾` : '学点什么 ▾'
+})
+
+const filterByCategory = (categoryName) => {
+  learnOpen.value = false
+  router.push({ path: '/', query: { tag: categoryName } })
+}
 </script>
 
 <template>
@@ -17,7 +49,18 @@ const menuOpen = ref(false)
       
       <div class="nav-right">
         <ul class="nav-links" :class="{ open: menuOpen }">
-          <li><RouterLink to="/" exact-active-class="active">首页</RouterLink></li>
+          <li><RouterLink to="/" :class="{ active: route.path === '/' && !activeTag && !isSuiActive }">首页</RouterLink></li>
+          <li class="nav-dropdown" @mouseenter="learnOpen = true" @mouseleave="learnOpen = false">
+            <span class="nav-dropdown-trigger" :class="{ active: activeTag }">{{ learnLabel }}</span>
+            <ul class="nav-dropdown-menu" :class="{ open: learnOpen }">
+              <li v-for="cat in categories" :key="cat.name" @click="filterByCategory(cat.name)">
+                <span class="dropdown-icon" :style="{ backgroundColor: cat.color, color: '#323330' }">{{ cat.icon }}</span>
+                <span class="dropdown-name">{{ cat.name }}</span>
+                <span class="dropdown-count">{{ cat.count }}</span>
+              </li>
+            </ul>
+          </li>
+          <li><RouterLink to="/?tag=碎碎念" :class="{ active: isSuiActive }">碎碎念</RouterLink></li>
           <li><RouterLink to="/timeline" active-class="active">时间线</RouterLink></li>
           <li><RouterLink to="/todo" active-class="active">To Do List</RouterLink></li>
           <li><RouterLink to="/about" active-class="active">关于</RouterLink></li>
@@ -111,6 +154,93 @@ const menuOpen = ref(false)
 .nav-links a.active {
   color: var(--color-primary);
   background: var(--color-primary-light);
+}
+
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  display: block;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+  min-width: 7.5rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.nav-dropdown:hover .nav-dropdown-trigger,
+.nav-dropdown-trigger.active {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.nav-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 6px 0;
+  list-style: none;
+  z-index: 110;
+}
+
+.nav-dropdown-menu.open {
+  display: block;
+}
+
+.nav-dropdown-menu li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.nav-dropdown-menu li:hover {
+  background: var(--color-primary-light);
+}
+
+.dropdown-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.dropdown-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.dropdown-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  background: var(--color-tag-bg);
+  padding: 2px 8px;
+  border-radius: 50px;
+  min-width: 24px;
+  text-align: center;
 }
 
 .theme-toggle {

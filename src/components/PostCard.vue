@@ -26,6 +26,13 @@ const formatDate = (dateStr) => {
 
 const getCoverStyle = (post) => {
   const config = post.coverConfig || {}
+  if (config.image) {
+    return {
+      backgroundImage: `url(${config.image})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }
+  }
   return {
     background: `linear-gradient(135deg, ${config.bg || '#1e1e2e'} 0%, ${darkenColor(config.bg || '#1e1e2e', 20)} 100%)`,
   }
@@ -38,7 +45,13 @@ const getAccentColor = (post) => {
 
 const getLogoUrl = (post) => {
   const config = post.coverConfig || {}
+  if (config.image) return null
   return config.logo || 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg'
+}
+
+const hasImageCover = (post) => {
+  const config = post.coverConfig || {}
+  return !!config.image
 }
 
 // 辅助函数：加深颜色
@@ -58,6 +71,7 @@ const darkenColor = (hex, percent) => {
       <div class="post-card-cover" :style="getCoverStyle(post)">
         <div class="post-card-cover-content">
           <img 
+            v-if="!hasImageCover(post)"
             class="post-card-logo" 
             :src="getLogoUrl(post)" 
             :alt="post.category"

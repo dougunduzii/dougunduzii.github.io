@@ -102,9 +102,35 @@ const LANG_COVERS = {
     bg: '#1a1a2e',
     accent: '#3178c6',
   },
+  sui: {
+    logo: null,
+    bg: '#1c1917',
+    accent: '#f59e0b',
+  },
 }
 
 const FALLBACK_COVER = LANG_COVERS.javascript
+
+const ANIME_IMAGES = [
+  '/imgs/denys-nevozhai-HhmCIJTLuGY-unsplash.jpg',
+  '/imgs/henning-witzel-ukvgqriuOgo-unsplash.jpg',
+  '/imgs/jonathan-roger-LY1eyQMFeyo-unsplash.jpg',
+  '/imgs/max-bender-VmX3vmBecFE-unsplash.jpg',
+  '/imgs/thomas-habr-6NmnrAJPq7M-unsplash (1).jpg',
+  '/imgs/timo-wagner-fT6-YkB0nfg-unsplash.jpg',
+]
+
+const hashString = (str) => {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0
+  }
+  return Math.abs(hash)
+}
+
+const getAnimeCover = (seed) => {
+  return ANIME_IMAGES[seed % ANIME_IMAGES.length]
+}
 
 const getLangFromTags = (tags, category) => {
   // 优先使用分类（文件夹名）来判断
@@ -114,6 +140,7 @@ const getLangFromTags = (tags, category) => {
     if (lowerCategory === '算法' || lowerCategory === 'algorithm') return 'algorithm'
     if (lowerCategory === 'javascript') return 'javascript'
     if (lowerCategory === 'typescript') return 'typescript'
+    if (lowerCategory === '碎碎念') return 'sui'
   }
   // 备用：使用tags判断
   if (!Array.isArray(tags) || tags.length === 0) return 'javascript'
@@ -127,8 +154,15 @@ const getLangFromTags = (tags, category) => {
   return 'javascript'
 }
 
-const getCoverConfig = (tags, category) => {
+const getCoverConfig = (tags, category, slug) => {
   const lang = getLangFromTags(tags, category)
+  if (lang === 'sui' && slug) {
+    return {
+      image: getAnimeCover(hashString(slug)),
+      bg: '#1c1917',
+      accent: '#f59e0b',
+    }
+  }
   return LANG_COVERS[lang] || FALLBACK_COVER
 }
 
@@ -138,6 +172,7 @@ const CATEGORY_CONFIG = {
   'TypeScript': { icon: 'TS', color: '#3178c6' },
   'MySQL': { icon: 'SQL', color: '#00758f' },
   '算法': { icon: '算', color: '#e74c3c' },
+  '碎碎念': { icon: '碎', color: '#f59e0b' },
 }
 
 const getCategoryConfig = (name) => {
@@ -195,7 +230,7 @@ export const loadPost = async (slug) => {
     category: category,
     summary: meta.summary || '',
     cover: meta.cover || null,
-    coverConfig: getCoverConfig([category], category),
+    coverConfig: getCoverConfig([category], category, slug),
     markdown: parsed.content
   }
   

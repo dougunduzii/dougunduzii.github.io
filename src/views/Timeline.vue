@@ -46,6 +46,7 @@ const getCategoryIcon = (post) => {
   if (cat === 'typescript') return 'TS'
   if (cat === 'mysql') return 'SQL'
   if (cat === '算法') return '算'
+  if (cat === '碎碎念') return '碎'
   return cat.substring(0, 2).toUpperCase()
 }
 

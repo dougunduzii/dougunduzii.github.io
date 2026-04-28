@@ -43,16 +43,6 @@ const currentTag = computed(() => {
   return route.query.tag || 'all'
 })
 
-const allTags = computed(() => {
-  const tags = new Set()
-  posts.value.forEach(post => {
-    if (Array.isArray(post.tags)) {
-      post.tags.forEach(tag => tags.add(tag))
-    }
-  })
-  return Array.from(tags)
-})
-
 const filteredPosts = computed(() => {
   return posts.value.filter(post => {
     const matchTag = currentTag.value === 'all' || (post.tags && post.tags.includes(currentTag.value))
@@ -64,14 +54,6 @@ const filteredPosts = computed(() => {
     return matchTag && matchSearch
   })
 })
-
-const selectTag = (tag) => {
-  if (tag === 'all') {
-    router.push({ path: '/' })
-  } else {
-    router.push({ path: '/', query: { tag } })
-  }
-}
 
 const openPost = (slug) => {
   router.push(`/post/${slug}`)
@@ -119,25 +101,6 @@ onMounted(async () => {
     </section>
 
     <main class="container">
-      <section class="tags-section">
-        <button 
-          class="tag-btn" 
-          :class="{ active: currentTag === 'all' }"
-          @click="selectTag('all')"
-        >
-          全部
-        </button>
-        <button 
-          v-for="tag in allTags" 
-          :key="tag"
-          class="tag-btn"
-          :class="{ active: currentTag === tag }"
-          @click="selectTag(tag)"
-        >
-          {{ tag }}
-        </button>
-      </section>
-
       <div v-if="loading" class="loading">
         <div class="loading-spinner"></div>
         <p>加载中...</p>
@@ -212,37 +175,6 @@ onMounted(async () => {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-light);
-}
-
-.tags-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 32px;
-  padding: 4px;
-}
-
-.tag-btn {
-  padding: 8px 16px;
-  border: 1px solid var(--color-border);
-  border-radius: 50px;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition);
-}
-
-.tag-btn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.tag-btn.active {
-  background: var(--color-primary);
-  color: white;
-  border-color: var(--color-primary);
 }
 
 .loading {

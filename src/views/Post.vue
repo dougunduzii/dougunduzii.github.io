@@ -46,9 +46,21 @@ const getCoverStyle = (post) => {
   if (!post) return {}
   if (post.cover) return { backgroundImage: `url(${post.cover})` }
   const config = post.coverConfig || {}
+  if (config.image) {
+    return {
+      backgroundImage: `url(${config.image})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    }
+  }
   return {
     background: `linear-gradient(135deg, ${config.bg || '#1e1e2e'} 0%, ${config.accent2 || '#2a2a3e'} 100%)`,
   }
+}
+
+const hasImageCover = (post) => {
+  const config = post.coverConfig || {}
+  return !!config.image
 }
 
 const getAccentColor = (post) => {
@@ -118,16 +130,16 @@ const renderMarkdown = (markdown) => {
   // 获取文章分类，用于构建正确的图片路径
   const category = post.value?.category || 'JavaScript'
   
-  // 处理 Markdown 格式图片路径：将相对路径 ./picture/ 转换为绝对路径 /posts/{category}/picture/
+  // 处理 Markdown 格式图片路径：将相对路径 ./xxx/ 转换为绝对路径 /posts/{category}/xxx/
   processedMarkdown = processedMarkdown.replace(
-    /!\[(.*?)\]\(\.\.?\/picture\/(.*?)\)/g, 
-    `![$1](/posts/${category}/picture/$2)`
+    /!\[(.*?)\]\(\.\.?(\/[^)]+)\)/g,
+    `![$1](/posts/${category}$2)`
   )
-  
-  // 处理 HTML 格式图片路径：<img src="./picture/..."> 转换为 <img src="/posts/{category}/picture/...">
+
+  // 处理 HTML 格式图片路径：<img src="./xxx/..."> 转换为 <img src="/posts/{category}/xxx/...">
   processedMarkdown = processedMarkdown.replace(
-    /<img([^>]*?)src=["']\.\.?\/picture\/([^"']+)["']([^>]*)>/g, 
-    `<img$1src="/posts/${category}/picture/$2"$3>`
+    /<img([^>]*?)src=["']\.\.?(\/[^"']+)["']([^>]*)>/g,
+    `<img$1src="/posts/${category}$2"$3>`
   )
   
   processedMarkdown = processedMarkdown.replace(/\|\s*\.\.\s*\|\s*\.\.\s*\|/g, '| --- | --- |')
@@ -265,7 +277,7 @@ watch(() => route.params.slug, async (newSlug) => {
         <template v-else-if="post">
           <header class="post-detail-header">
             <div class="post-detail-cover" :style="getCoverStyle(post)">
-              <div v-if="!post.cover" class="post-detail-cover-content">
+              <div v-if="!post.cover && !hasImageCover(post)" class="post-detail-cover-content">
                 <div class="post-detail-cover-code" :style="{ color: getAccentColor(post) }">
                   {{ getCodeSymbol(post) }}
                 </div>
