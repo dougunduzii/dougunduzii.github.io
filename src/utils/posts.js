@@ -116,8 +116,11 @@ const ANIME_IMAGES = [
   '/imgs/henning-witzel-ukvgqriuOgo-unsplash.jpg',
   '/imgs/jonathan-roger-LY1eyQMFeyo-unsplash.jpg',
   '/imgs/max-bender-VmX3vmBecFE-unsplash.jpg',
-  '/imgs/thomas-habr-6NmnrAJPq7M-unsplash (1).jpg',
+  '/imgs/thomas-habr-6NmnrAJPq7M-unsplash.jpg',
   '/imgs/timo-wagner-fT6-YkB0nfg-unsplash.jpg',
+  '/imgs/gautam-krishnan-ZeWVbX7Ird8-unsplash.jpg',
+  '/imgs/luca-bravo-_QdFx92MO2U-unsplash.jpg',
+  '/imgs/malte-schmidt-enGr5YbjQKQ-unsplash.jpg',
 ]
 
 const hashString = (str) => {
