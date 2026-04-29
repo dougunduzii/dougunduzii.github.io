@@ -324,9 +324,10 @@ watch(() => route.params.slug, async (newSlug) => {
   top: 0;
   left: 0;
   height: 3px;
-  background: var(--color-primary);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   z-index: 1000;
   transition: width 0.1s ease;
+  box-shadow: 0 0 8px var(--color-primary-glow);
 }
 
 .post-detail {
@@ -349,6 +350,7 @@ watch(() => route.params.slug, async (newSlug) => {
   justify-content: center;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-lg);
 }
 
 .post-detail-cover::before {
@@ -399,6 +401,10 @@ watch(() => route.params.slug, async (newSlug) => {
   margin-bottom: 16px;
   letter-spacing: -0.03em;
   line-height: 1.2;
+  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .post-detail-meta {
@@ -414,6 +420,7 @@ watch(() => route.params.slug, async (newSlug) => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: center;
 }
 
 .post-detail-tags span {
@@ -423,6 +430,13 @@ watch(() => route.params.slug, async (newSlug) => {
   color: var(--color-tag-text);
   border-radius: 50px;
   font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.post-detail-tags span:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-1px);
 }
 
 .post-detail-content-wrapper {
@@ -430,8 +444,14 @@ watch(() => route.params.slug, async (newSlug) => {
   margin: 0 auto;
   background: var(--color-surface);
   border-radius: var(--radius);
-  padding: 40px;
+  padding: 44px 48px;
   border: 1px solid var(--color-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.3s ease;
+}
+
+.post-detail-content-wrapper:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .post-detail-content {
@@ -502,7 +522,7 @@ watch(() => route.params.slug, async (newSlug) => {
   }
 
   .post-detail-content-wrapper {
-    padding: 24px;
+    padding: 24px 20px;
   }
 
   .post-detail-content {
@@ -512,20 +532,40 @@ watch(() => route.params.slug, async (newSlug) => {
 </style>
 
 <style>
+.post-detail-content {
+  --heading-accent: var(--color-primary);
+}
+
 .post-detail-content h2 {
   font-size: 1.7rem;
   font-weight: 700;
   margin: 48px 0 16px;
-  padding-top: 20px;
+  padding: 20px 0 0 18px;
   border-top: 1px solid var(--color-border);
+  border-left: 4px solid transparent;
+  border-image: linear-gradient(180deg, var(--color-primary), var(--color-accent)) 1;
   letter-spacing: -0.02em;
   color: var(--color-text);
+  position: relative;
+}
+
+.post-detail-content h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-primary), transparent);
 }
 
 .post-detail-content h3 {
   font-size: 1.35rem;
   font-weight: 600;
   margin: 32px 0 12px;
+  padding-left: 14px;
+  border-left: 3px solid var(--color-primary);
   color: var(--color-text);
 }
 
@@ -534,6 +574,8 @@ watch(() => route.params.slug, async (newSlug) => {
   font-weight: 600;
   margin: 24px 0 8px;
   color: var(--color-text);
+  position: relative;
+  display: inline-block;
 }
 
 .post-detail-content p {
@@ -544,11 +586,27 @@ watch(() => route.params.slug, async (newSlug) => {
   color: var(--color-primary);
   text-decoration: none;
   transition: color var(--transition);
+  position: relative;
+}
+
+.post-detail-content a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 0;
+  height: 1.5px;
+  background: var(--color-primary);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 1px;
 }
 
 .post-detail-content a:hover {
-  text-decoration: underline;
-  color: var(--color-primary-dark);
+  color: var(--color-primary-hover);
+}
+
+.post-detail-content a:hover::after {
+  width: 100%;
 }
 
 .post-detail-content .code-block-wrapper {
@@ -720,6 +778,8 @@ watch(() => route.params.slug, async (newSlug) => {
   border-radius: 4px;
   font-size: 0.88em;
   font-family: var(--font-mono);
+  border: 1px solid transparent;
+  border-color: color-mix(in srgb, var(--color-inline-code-text) 10%, transparent);
 }
 
 .post-detail-content ul,
@@ -730,28 +790,57 @@ watch(() => route.params.slug, async (newSlug) => {
 
 .post-detail-content li {
   margin-bottom: 8px;
+  line-height: 1.8;
 }
 
 .post-detail-content li::marker {
   color: var(--color-primary);
 }
 
+.post-detail-content ul ul,
+.post-detail-content ol ol,
+.post-detail-content ul ol,
+.post-detail-content ol ul {
+  margin: 4px 0;
+}
+
 .post-detail-content blockquote {
   border-left: 4px solid var(--color-primary);
   padding: 18px 24px;
   margin: 28px 0;
-  background: var(--color-primary-light);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, transparent 80%);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   color: var(--color-text);
   font-style: italic;
   font-size: 1.02rem;
+  position: relative;
+}
+
+.post-detail-content blockquote::before {
+  content: '\201C';
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--color-primary);
+  opacity: 0.2;
+  font-family: Georgia, serif;
+}
+
+.post-detail-content blockquote p:last-child {
+  margin-bottom: 0;
 }
 
 .post-detail-content table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 24px 0;
   font-size: 0.98rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .post-detail-content th,
@@ -764,11 +853,89 @@ watch(() => route.params.slug, async (newSlug) => {
 .post-detail-content th {
   background: var(--color-tag-bg);
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.post-detail-content tbody tr {
+  transition: background 0.2s ease;
+}
+
+.post-detail-content tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--color-surface) 95%, var(--color-primary) 5%);
+}
+
+.post-detail-content tbody tr:hover {
+  background: var(--color-primary-light);
 }
 
 .post-detail-content img {
   max-width: 100%;
   border-radius: var(--radius-sm);
   margin: 24px 0;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: zoom-in;
+}
+
+.post-detail-content img:hover {
+  transform: scale(1.01);
+  box-shadow: var(--shadow-lg);
+}
+
+.post-detail-content hr {
+  margin: 40px 0;
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-primary) 20%, var(--color-accent) 50%, var(--color-primary) 80%, transparent);
+  opacity: 0.3;
+  border-radius: 2px;
+}
+
+.post-detail-content strong {
+  font-weight: 650;
+}
+
+.post-detail-content mark {
+  background: linear-gradient(120deg, transparent 0%, color-mix(in srgb, var(--color-primary) 20%, transparent) 40%, color-mix(in srgb, var(--color-primary) 20%, transparent) 60%, transparent 100%);
+  color: inherit;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+.post-detail-content kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 0.82em;
+  font-family: var(--font-mono);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--color-border);
+  line-height: 1.4;
+}
+
+.post-detail-content details {
+  margin: 20px 0;
+  padding: 16px 20px;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.post-detail-content details:hover {
+  border-color: var(--color-primary);
+}
+
+.post-detail-content summary {
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-primary);
+}
+
+.post-detail-content details[open] summary {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
 }
 </style>

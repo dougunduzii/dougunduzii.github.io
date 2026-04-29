@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 
 const userInfo = {
-  nickname: '豆根杜子',
+  nickname: '豆棍杜子',
   avatar: '/boy.png',
   bio: ' ',
 }
