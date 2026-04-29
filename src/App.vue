@@ -62,14 +62,22 @@ provide('toggleTheme', toggleTheme)
   flex: 1;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
+.fade-enter-active {
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fade-enter-from,
+.fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
 .fade-leave-to {
   opacity: 0;
+  transform: translateY(-4px);
 }
 
 @media (max-width: 768px) {

@@ -64,7 +64,11 @@ onUnmounted(() => {
 .back-to-top:hover {
   background: var(--color-primary-hover);
   transform: translateY(-3px);
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-xl), 0 0 20px var(--color-primary-glow);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
 }
 
 @media (max-width: 768px) {

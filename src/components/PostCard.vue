@@ -104,6 +104,18 @@ const darkenColor = (hex, percent) => {
   display: flex;
   flex-direction: column;
   position: relative;
+  animation: cardIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .post-card::after {
@@ -198,6 +210,25 @@ const darkenColor = (hex, percent) => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.post-card-body::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 22px;
+  right: 22px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.post-card:hover .post-card-body::after {
+  transform: scaleX(1);
 }
 
 .post-card-date {

@@ -168,13 +168,22 @@ onMounted(async () => {
   font-size: 1rem;
   background: var(--color-surface);
   color: var(--color-text);
-  transition: all var(--transition);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-box input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
+  box-shadow: 0 0 0 3px var(--color-primary-light), 0 4px 16px var(--color-primary-glow);
+  transform: translateY(-1px);
+}
+
+.search-box input::placeholder {
+  transition: color 0.2s ease;
+}
+
+.search-box input:focus::placeholder {
+  color: var(--color-text-tertiary);
 }
 
 .loading {
@@ -217,6 +226,16 @@ onMounted(async () => {
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
 }
+
+.posts-grid > *:nth-child(1) { animation-delay: 0.05s; }
+.posts-grid > *:nth-child(2) { animation-delay: 0.1s; }
+.posts-grid > *:nth-child(3) { animation-delay: 0.15s; }
+.posts-grid > *:nth-child(4) { animation-delay: 0.2s; }
+.posts-grid > *:nth-child(5) { animation-delay: 0.25s; }
+.posts-grid > *:nth-child(6) { animation-delay: 0.3s; }
+.posts-grid > *:nth-child(7) { animation-delay: 0.35s; }
+.posts-grid > *:nth-child(8) { animation-delay: 0.4s; }
+.posts-grid > *:nth-child(9) { animation-delay: 0.45s; }
 
 @media (max-width: 768px) {
   .hero h1 {

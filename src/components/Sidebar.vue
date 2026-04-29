@@ -127,6 +127,15 @@ const progress = computed(() => {
   transition: background var(--transition), border-color var(--transition);
 }
 
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+}
+
 [data-theme="dark"] .sidebar {
   background: rgba(12, 14, 20, 0.85);
 }
@@ -143,6 +152,13 @@ const progress = computed(() => {
   border: 3px solid var(--color-primary-light);
   margin-bottom: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-avatar:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px var(--color-primary-glow), 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: scale(1.06);
 }
 
 .sidebar-name {
@@ -173,6 +189,12 @@ const progress = computed(() => {
   border: 1px solid var(--color-border);
   padding: 14px;
   background: var(--color-surface);
+  transition: all 0.3s ease;
+}
+
+.music-card:hover {
+  box-shadow: 0 0 16px var(--color-primary-glow);
+  border-color: color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 .music-info {

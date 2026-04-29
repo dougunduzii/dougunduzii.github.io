@@ -224,8 +224,19 @@ onMounted(async () => {
 
 .timeline-items {
   margin-left: 9px;
-  border-left: 2px solid var(--color-border);
   padding-left: 20px;
+  position: relative;
+}
+
+.timeline-items::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-primary-light) 30%, var(--color-border) 70%, transparent);
+  border-radius: 1px;
 }
 
 .timeline-item {
