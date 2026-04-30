@@ -1,38 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { marked } from 'marked'
-import hljs from 'highlight.js'
+import { useMarkdownPage } from '../composables/useMarkdownPage.js'
 
-const markdownContent = ref('')
-const loading = ref(true)
-const error = ref(null)
-
-// 配置 marked
-marked.setOptions({
-  highlight: function(code, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      return hljs.highlight(code, { language: lang }).value
-    }
-    return hljs.highlightAuto(code).value
-  },
-  breaks: true
-})
-
-onMounted(async () => {
-  try {
-    const resp = await fetch('/about.md')
-    if (!resp.ok) {
-      throw new Error('无法加载 about.md')
-    }
-    const text = await resp.text()
-    markdownContent.value = marked.parse(text)
-  } catch (err) {
-    console.error('加载 about.md 失败:', err)
-    error.value = err.message
-  } finally {
-    loading.value = false
-  }
-})
+const { content, loading, error } = useMarkdownPage('/about.md')
 </script>
 
 <template>
@@ -42,12 +11,10 @@ onMounted(async () => {
         <div class="loading-spinner"></div>
         <p>加载中...</p>
       </div>
-      
       <div v-else-if="error" class="error">
         <p>加载失败: {{ error }}</p>
       </div>
-      
-      <div v-else class="about-content markdown-body" v-html="markdownContent"></div>
+      <div v-else class="about-content markdown-body" v-html="content"></div>
     </div>
   </div>
 </template>
@@ -92,7 +59,6 @@ onMounted(async () => {
   color: #e74c3c;
 }
 
-/* Markdown 样式 */
 .markdown-body :deep(img) {
   max-width: 100%;
   height: auto;

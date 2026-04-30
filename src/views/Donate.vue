@@ -1,47 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { marked } from 'marked'
-import hljs from 'highlight.js'
+import { useMarkdownPage } from '../composables/useMarkdownPage.js'
 
-const markdownContent = ref('')
-const loading = ref(true)
-const error = ref(null)
-
-marked.setOptions({
-  highlight: function(code, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      return hljs.highlight(code, { language: lang }).value
-    }
-    return hljs.highlightAuto(code).value
-  },
-  breaks: true
-})
-
-onMounted(async () => {
-  try {
-    const resp = await fetch('/posts/打赏.md')
-    if (!resp.ok) throw new Error('无法加载打赏页面')
-    let text = await resp.text()
-
-    // 处理 Markdown 格式图片路径：![](.xxx)
-    text = text.replace(
-      /!\[(.*?)\]\(\.\.?(\/[^)]+)\)/g,
-      '![$1](/posts$2)'
-    )
-
-    // 处理 HTML 格式图片路径：<img src="./xxx">
-    text = text.replace(
-      /<img([^>]*?)src=["']\.\.?(\/[^"']+)["']([^>]*)>/g,
-      '<img$1src="/posts$2"$3>'
-    )
-
-    markdownContent.value = marked.parse(text)
-  } catch (err) {
-    error.value = err.message
-  } finally {
-    loading.value = false
-  }
-})
+const { content, loading, error } = useMarkdownPage('/posts/打赏.md', '/posts')
 </script>
 
 <template>
@@ -54,7 +14,7 @@ onMounted(async () => {
       <div v-else-if="error" class="error">
         <p>加载失败: {{ error }}</p>
       </div>
-      <div v-else class="donate-content markdown-body" v-html="markdownContent"></div>
+      <div v-else class="donate-content markdown-body" v-html="content"></div>
     </div>
   </div>
 </template>

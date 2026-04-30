@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+const AUDIO_SRC = '/周杰伦 - 蒲公英的约定.mp3'
+
 const userInfo = {
   nickname: '豆棍杜子',
   avatar: '/boy.png',
@@ -71,9 +73,9 @@ const progress = computed(() => {
 
     <div class="sidebar-music">
       <div class="music-card">
-        <audio 
+        <audio
           ref="audioRef"
-          :src="'/' + encodeURIComponent('周杰伦 - 蒲公英的约定') + '.mp3'"
+          :src="AUDIO_SRC"
           @timeupdate="onTimeUpdate"
           @loadedmetadata="onLoadedMetadata"
           @ended="onEnded"
