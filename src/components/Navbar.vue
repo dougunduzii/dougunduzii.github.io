@@ -60,10 +60,12 @@ const filterByCategory = (categoryName) => {
               </li>
             </ul>
           </li>
+             <li><RouterLink to="/resources" active-class="active">资源站</RouterLink></li>
           <li><RouterLink to="/?tag=碎碎念" :class="{ active: isSuiActive }">碎碎念</RouterLink></li>
           <li><RouterLink to="/timeline" active-class="active">时间线</RouterLink></li>
           <li><RouterLink to="/todo" active-class="active">To Do List</RouterLink></li>
           <li><RouterLink to="/about" active-class="active">关于</RouterLink></li>
+          <li><RouterLink to="/donate" active-class="active">打赏</RouterLink></li>
         </ul>
         
         <button class="theme-toggle" @click="toggleTheme" :aria-label="theme === 'dark' ? '切换亮色模式' : '切换暗色模式'">
