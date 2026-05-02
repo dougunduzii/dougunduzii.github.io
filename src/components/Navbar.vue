@@ -72,7 +72,7 @@ const filterByCategory = (categoryName) => {
           {{ theme === 'dark' ? '☀️' : '🌙' }}
         </button>
         
-        <button class="nav-toggle" @click="menuOpen = !menuOpen" aria-label="菜单">
+        <button class="nav-toggle" :class="{ open: menuOpen }" @click="menuOpen = !menuOpen" aria-label="菜单">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -194,6 +194,7 @@ const filterByCategory = (categoryName) => {
   min-width: 7.5rem;
   text-align: center;
   white-space: nowrap;
+  position: relative;
 }
 
 .nav-dropdown:hover .nav-dropdown-trigger,
@@ -318,6 +319,9 @@ const filterByCategory = (categoryName) => {
   border: none;
   cursor: pointer;
   padding: 4px;
+  position: relative;
+  width: 22px;
+  height: 16px;
 }
 
 .nav-toggle span {
@@ -326,7 +330,28 @@ const filterByCategory = (categoryName) => {
   height: 2px;
   background: var(--color-text);
   border-radius: 2px;
-  transition: all var(--transition);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: absolute;
+  left: 0;
+}
+
+.nav-toggle span:nth-child(1) { top: 0; }
+.nav-toggle span:nth-child(2) { top: 7px; }
+.nav-toggle span:nth-child(3) { bottom: 0; }
+
+.nav-toggle.open span:nth-child(1) {
+  top: 7px;
+  transform: rotate(45deg);
+}
+
+.nav-toggle.open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.nav-toggle.open span:nth-child(3) {
+  bottom: 7px;
+  transform: rotate(-45deg);
 }
 
 @media (max-width: 768px) {
@@ -335,7 +360,6 @@ const filterByCategory = (categoryName) => {
   }
 
   .nav-links {
-    display: none;
     position: absolute;
     top: 68px;
     left: 0;
@@ -346,10 +370,19 @@ const filterByCategory = (categoryName) => {
     padding: 12px 24px;
     gap: 4px;
     box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
   }
 
   .nav-links.open {
     display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
   }
 
   .nav-dropdown-menu {

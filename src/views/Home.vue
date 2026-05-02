@@ -90,20 +90,37 @@ onMounted(async () => {
       <div class="container">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input 
-            v-model="searchQuery" 
-            type="text" 
+          <input
+            v-model="searchQuery"
+            type="text"
             placeholder="搜索文章..."
             autocomplete="off"
           >
+          <button
+            v-if="searchQuery"
+            class="search-clear"
+            @click="searchQuery = ''"
+            aria-label="清除搜索"
+          >×</button>
         </div>
       </div>
     </section>
 
     <main class="container">
-      <div v-if="loading" class="loading">
-        <div class="loading-spinner"></div>
-        <p>加载中...</p>
+      <div v-if="loading" class="posts-grid">
+        <div v-for="i in 6" :key="i" class="skeleton-card">
+          <div class="skeleton-cover"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-date"></div>
+            <div class="skeleton-title"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text short"></div>
+            <div class="skeleton-tags">
+              <div class="skeleton-tag"></div>
+              <div class="skeleton-tag"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-else-if="filteredPosts.length === 0" class="no-results">
@@ -186,6 +203,32 @@ onMounted(async () => {
   color: var(--color-text-tertiary);
 }
 
+.search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: var(--color-tag-bg);
+  color: var(--color-text-secondary);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.search-clear:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
 .loading {
   text-align: center;
   padding: 60px 0;
@@ -203,6 +246,76 @@ onMounted(async () => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.skeleton-card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.skeleton-cover {
+  width: 100%;
+  height: 210px;
+  background: linear-gradient(90deg, var(--color-tag-bg) 25%, var(--color-surface-hover) 50%, var(--color-tag-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-body {
+  padding: 22px;
+}
+
+.skeleton-date {
+  width: 80px;
+  height: 12px;
+  background: var(--color-tag-bg);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-title {
+  width: 70%;
+  height: 20px;
+  background: var(--color-tag-bg);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  animation: shimmer 1.5s ease-in-out infinite 0.1s;
+}
+
+.skeleton-text {
+  width: 100%;
+  height: 14px;
+  background: var(--color-tag-bg);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  animation: shimmer 1.5s ease-in-out infinite 0.2s;
+}
+
+.skeleton-text.short {
+  width: 60%;
+  animation-delay: 0.3s;
+}
+
+.skeleton-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.skeleton-tag {
+  width: 50px;
+  height: 22px;
+  background: var(--color-tag-bg);
+  border-radius: 50px;
+  animation: shimmer 1.5s ease-in-out infinite 0.4s;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .no-results {

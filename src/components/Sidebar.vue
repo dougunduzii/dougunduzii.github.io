@@ -208,9 +208,16 @@ const progress = computed(() => {
 .music-cover {
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
+  border: 2px solid var(--color-border);
+  transition: border-color 0.3s ease;
+}
+
+.music-cover.playing {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-primary-glow);
 }
 
 .music-cover img {
@@ -220,12 +227,12 @@ const progress = computed(() => {
 }
 
 .music-cover.playing img {
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: discSpin 4s linear infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
+@keyframes discSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .music-meta {

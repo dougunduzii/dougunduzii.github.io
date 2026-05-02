@@ -310,7 +310,10 @@ watch(() => route.params.slug, async (newSlug) => {
           </div>
 
           <footer class="post-detail-footer">
-            <RouterLink to="/" class="back-link">← 返回首页</RouterLink>
+            <RouterLink to="/" class="back-link">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+              返回首页
+            </RouterLink>
           </footer>
         </template>
       </div>
@@ -482,6 +485,7 @@ watch(() => route.params.slug, async (newSlug) => {
 .back-link:hover {
   background: var(--color-primary-light);
   text-decoration: none;
+  transform: translateX(-4px);
 }
 
 .loading {
