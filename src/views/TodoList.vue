@@ -1,6 +1,7 @@
 <script setup>
 const plans = [
-  { name: 'TypeScript', time: '2026.5', status: 'upcoming', icon: '🔷', done: false },
+  { name: 'TypeScript', time: '2026.5', status: 'upcoming', icon: '🔷', done: true },
+  { name: '算法', time: '2026.5-2026.6', status: 'upcoming', icon: '🎪', done: false },
   { name: 'FastAPI', time: '2026.6', status: 'upcoming', icon: '⚡', done: false },
   { name: 'LangChain', time: 'unknown', status: 'pending', icon: '🔗', done: false }
 ]
