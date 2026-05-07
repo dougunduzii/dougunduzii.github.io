@@ -1,9 +1,9 @@
 <script setup>
 const plans = [
-  { name: 'TypeScript', time: '2026.5', status: 'upcoming', icon: '🔷', done: true },
-  { name: '算法 for 蓝桥杯', time: '2026.5-2026.6', status: 'upcoming', icon: '🎪', done: false },
-  { name: 'FastAPI', time: '2026.6', status: 'upcoming', icon: '⚡', done: false },
-  { name: 'LangChain', time: 'unknown', status: 'pending', icon: '🔗', done: false }
+  { name: 'TypeScript', time: '2026.5', icon: '🔷', done: true },
+  { name: '算法 for 蓝桥杯', time: '2026.5-2026.6', icon: '🎪', done: false },
+  { name: 'FastAPI', time: '2026.6', icon: '⚡', done: false },
+  { name: 'LangChain', time: 'unknown', icon: '🔗', done: false }
 ]
 </script>
 
@@ -21,7 +21,7 @@ const plans = [
           v-for="(plan, index) in plans"
           :key="index"
           class="todo-card"
-          :class="plan.status"
+          :class="{ done: plan.done, pending: plan.time === 'unknown' }"
         >
           <div class="todo-timeline">
             <div class="todo-dot"></div>
@@ -40,7 +40,7 @@ const plans = [
               <span class="todo-time-badge" :class="{ unknown: plan.time === 'unknown' }">
                 {{ plan.time === 'unknown' ? '待定' : plan.time }}
               </span>
-              <span class="todo-status">{{ plan.time === 'unknown' ? '规划中' : '计划中' }}</span>
+              <span class="todo-status">{{ plan.done ? '已完成' : plan.time === 'unknown' ? '规划中' : '进行中' }}</span>
             </div>
           </div>
         </div>
@@ -127,6 +127,21 @@ const plans = [
 
 .todo-card.pending .todo-line {
   background: linear-gradient(to bottom, var(--color-text-tertiary), var(--color-border));
+}
+
+.todo-card.done .todo-dot {
+  background: #10b981;
+  border-color: #d1fae5;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+.todo-card.done .todo-name {
+  text-decoration: line-through;
+  color: var(--color-text-tertiary);
+}
+
+.todo-card.done .todo-status {
+  color: #10b981;
 }
 
 .todo-card-inner {
